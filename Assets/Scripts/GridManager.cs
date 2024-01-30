@@ -12,6 +12,35 @@ public class GridManager : MonoBehaviour
     [SerializeField] private int maxRepeat;
     private int ballPosWidth;
     private int ballPosHeight;
+    private int lastStopW,lastStopH;
+
+    private int BallPosHeight
+    {
+        get => ballPosHeight;
+        set
+        {
+            ballPosHeight = ballPosHeight switch
+            {
+                < 1 => 1,
+                > 8 => 8,
+                _ => value
+            };
+        }
+    }
+
+    private int BallPosWidth
+    {
+        get => ballPosWidth;
+        set
+        {
+            ballPosWidth = ballPosWidth switch
+            {
+                < 1 => 1,
+                > 8 => 8,
+                _ => value
+            };
+        }
+    }
 
 
     private void Start()
@@ -45,10 +74,10 @@ public class GridManager : MonoBehaviour
     private void GenerateLevel()
     {
         //Topun yeri
-        ballPosWidth = Random.Range(0, 10);
-        ballPosHeight = Random.Range(0, 10);
-        var ballObject = Instantiate(ball, grid[ballPosWidth, ballPosHeight].transform.position,
-            Quaternion.identity, grid[ballPosWidth, ballPosHeight].transform);
+        BallPosWidth = Random.Range(0, 10);
+        BallPosHeight = Random.Range(0, 10);
+        var ballObject = Instantiate(ball, grid[BallPosWidth, BallPosHeight].transform.position,
+            Quaternion.identity, grid[BallPosWidth, BallPosHeight].transform);
         ballObject.name = "Ball";
         ballObject.transform.position += new Vector3(0, 0.5f, 0);
         for (int i = 0; i < maxRepeat; i++)
@@ -58,9 +87,6 @@ public class GridManager : MonoBehaviour
             var movement = Random.Range(2, 9);
             for (int j = 0; j <= movement; j++)
             {
-                //boundsu aşmama kodunu ayarlayacaksın sonra onunde kutu varsa durmasını sağlayacaksın
-                //en son boş kalan yerlere kutu koymasını sağlayacaksın
-                // şu anda kod block koyduğu yerde durduğunu zannediyor.
                 switch (direction) 
                     {
                     case 0:
@@ -77,38 +103,78 @@ public class GridManager : MonoBehaviour
                         break; 
                     }
             }
-            Debug.Log("stopped at "+ ballPosWidth.ToString()+ballPosHeight.ToString());
+            lastStopH = BallPosHeight;
+            lastStopW = BallPosWidth;
         }
+        FillEmptyGrids();
     }
 
     private void ManageMovement(int movement, int j, bool isVertical = false, bool isNegative = false)
     {
-        Debug.Log(ballPosWidth.ToString() + ballPosHeight.ToString()+isNegative.ToString());
+        
         if (j < movement)
         {
-            grid[ballPosWidth, ballPosHeight].transform.GetChild(0).gameObject.SetActive(true);
+            if (grid[BallPosWidth, BallPosHeight].transform.GetChild(1).gameObject.activeSelf)
+            {
+                BallPosWidth = lastStopW;
+                BallPosHeight = lastStopH;
+                return;
+            }
+            grid[BallPosWidth, BallPosHeight].transform.GetChild(0).gameObject.SetActive(true);
+            if ( isVertical)
+            {
+                BallPosHeight += isNegative ? -1 : +1;
+            }
+            if (!isVertical)
+            {
+                BallPosWidth += isNegative ? -1 : +1;
+            }
         }
         else
         {
-            if (isVertical)
+            if (grid[BallPosWidth, BallPosHeight].transform.GetChild(0).gameObject.activeSelf)
             {
-                grid[ballPosWidth, ballPosHeight].transform.GetChild(0).gameObject.SetActive(true);
-                grid[ballPosWidth, isNegative ? ballPosHeight - 1 : ballPosHeight + 1].transform.GetChild(1).gameObject.SetActive(true);
+                BallPosWidth = lastStopW;
+                BallPosHeight = lastStopH;
+                return;
             }
-            else
+            grid[BallPosWidth, BallPosHeight].transform.GetChild(1).gameObject.SetActive(true);
+            if ( isVertical)
             {
-                grid[ballPosWidth, ballPosHeight].transform.GetChild(0).gameObject.SetActive(true);
-                grid[isNegative ? ballPosWidth -1: ballPosWidth +1, ballPosHeight].transform.GetChild(1).gameObject.SetActive(true);
+                BallPosHeight += isNegative ? +1 : -1;
+            }
+            if (!isVertical)
+            {
+                BallPosWidth += isNegative ? +1 : -1;
             }
         }
-        if ( isVertical)
+    }
+
+    private void FillEmptyGrids()
+    {
+        for (int i = 0; i < width; i++)
         {
-            ballPosHeight += isNegative ? -1 : +1;
+            grid[i,0].transform.GetChild(1).gameObject.SetActive(true);
+            grid[i,0].transform.GetChild(0).gameObject.SetActive(false);
+            //false yapmazsam yanlızca açık kalıyor bir şey değişmiyor gameplaywise
+            grid[0,i].transform.GetChild(1).gameObject.SetActive(true);
+            grid[0,i].transform.GetChild(0).gameObject.SetActive(false);
         }
-        if (!isVertical)
+
+        for (int j = 9; j >= 0; j--)
         {
-            ballPosWidth += isNegative ? -1 : +1;
+            grid[j,9].transform.GetChild(1).gameObject.SetActive(true);
+            grid[j,9].transform.GetChild(0).gameObject.SetActive(false);
+            grid[9,j].transform.GetChild(1).gameObject.SetActive(true);
+            grid[9,j].transform.GetChild(0).gameObject.SetActive(false);
         }
-        
+
+        foreach (var t in grid)
+        {
+            if (t.transform.GetChild(0).gameObject.activeSelf == false)
+            {
+                t.transform.GetChild(1).gameObject.SetActive(true);
+            }
+        }
     }
 }
