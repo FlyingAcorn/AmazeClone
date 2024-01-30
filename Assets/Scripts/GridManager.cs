@@ -156,7 +156,6 @@ public class GridManager : MonoBehaviour
         {
             grid[i,0].transform.GetChild(1).gameObject.SetActive(true);
             grid[i,0].transform.GetChild(0).gameObject.SetActive(false);
-            //false yapmazsam yanlızca açık kalıyor bir şey değişmiyor gameplaywise
             grid[0,i].transform.GetChild(1).gameObject.SetActive(true);
             grid[0,i].transform.GetChild(0).gameObject.SetActive(false);
         }
