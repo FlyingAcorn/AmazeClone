@@ -1,42 +1,43 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
     private bool isMoving;
-    private float _movementX;
-    private float _movementZ;
+    private float movementX;
+    private float movementZ;
+    [SerializeField] private int ballSpeed;
+    private Vector3 lastFloorPos;
     private void Update()
     {
         Movement();
     }
-
     private void Movement()
     {
-        // test ettin iyi gibi touch controller ile yap
-        // iki opsiyonun var ray atmak veya topun collision radiusunu kısıp collision olduğunda onu ortalamak 
-        // duvarlara deymemesi için
 #if UNITY_EDITOR
         if (!isMoving)
         {
-            _movementX = Input.GetAxisRaw("Horizontal");
-            _movementZ = Input.GetAxisRaw("Vertical");
-            if (Input.GetButtonDown("Horizontal")||Input.GetButtonDown("Vertical"))
-            {
-                isMoving = true;
-            }
+            if (!Input.GetButtonDown("Horizontal") && !Input.GetButtonDown("Vertical")) return;
+            movementX = Input.GetAxisRaw("Horizontal");
+            movementZ = Input.GetAxisRaw("Vertical");
+            transform.localScale = Input.GetButtonDown("Vertical") ?
+                new Vector3( 0.7f, 1,1) : new Vector3( 1, 1,0.7f);
+            isMoving = true;
         }
-        var movementDirection = new Vector3(_movementX, 0, _movementZ);
-        transform.position += movementDirection * Time.deltaTime * 5;
+        else
+        {
+            var movementDirection = new Vector3(movementX, 0, movementZ);
+            transform.position += movementDirection * (Time.deltaTime * ballSpeed);
+        }
 #endif
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent(out Block block))
+        if (collision.gameObject.TryGetComponent(out Block _))
         {
+            transform.localScale = new Vector3(1, 1, 1);
+            transform.position = lastFloorPos;
             isMoving = false;
         }
     }
@@ -45,8 +46,10 @@ public class Ball : MonoBehaviour
     {
         if (trigger.gameObject.TryGetComponent(out Floor floor))
         {
-            floor.gameObject.TryGetComponent(out Renderer renderer);
-            renderer.material.color = Color.blue;
+            var floorPos = floor.transform.position;
+            floor.gameObject.TryGetComponent(out Renderer component);
+            component.material.color = Color.blue;
+            lastFloorPos = new Vector3(floorPos.x, floorPos.y+0.5f,floorPos.z);
         }
     }
 }

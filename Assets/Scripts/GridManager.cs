@@ -19,12 +19,12 @@ public class GridManager : MonoBehaviour
         get => ballPosHeight;
         set
         {
-            ballPosHeight = ballPosHeight switch
-            {
-                < 1 => 1,
-                > 8 => 8,
-                _ => value
-            };
+            if (ballPosHeight < 1)
+                ballPosHeight = 1;
+            else if (ballPosHeight > 8)
+                ballPosHeight = 8;
+            else
+                ballPosHeight = value;
         }
     }
 
@@ -73,9 +73,9 @@ public class GridManager : MonoBehaviour
 
     private void GenerateLevel()
     {
-        //Topun yeri
-        BallPosWidth = Random.Range(0, 10);
-        BallPosHeight = Random.Range(0, 10);
+        //Topun yeri encapsulationun dışında olmasının nedeni ilk seçime karışmasın.
+        ballPosWidth = Random.Range(1, 9);
+        ballPosHeight = Random.Range(1, 9);
         var ballObject = Instantiate(ball, grid[BallPosWidth, BallPosHeight].transform.position,
             Quaternion.identity, grid[BallPosWidth, BallPosHeight].transform);
         ballObject.name = "Ball";
@@ -111,7 +111,7 @@ public class GridManager : MonoBehaviour
 
     private void ManageMovement(int movement, int j, bool isVertical = false, bool isNegative = false)
     {
-        
+        //DeadEndoluşturabiliyor onu ayarlayacaksın.
         if (j < movement)
         {
             if (grid[BallPosWidth, BallPosHeight].transform.GetChild(1).gameObject.activeSelf)
