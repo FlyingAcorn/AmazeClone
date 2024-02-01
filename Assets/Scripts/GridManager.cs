@@ -3,8 +3,8 @@ using Random = UnityEngine.Random;
 
 public class GridManager : MonoBehaviour
 {
-    [SerializeField] private int width;
-    [SerializeField] private int height;
+    [SerializeField] public int width;
+    [SerializeField] public int height;
     private GameObject[,] grid;
     [SerializeField] private Ball ball;
     [SerializeField] private Floor floor;
@@ -33,14 +33,19 @@ public class GridManager : MonoBehaviour
         get => ballPosWidth;
         set
         {
-            ballPosWidth = ballPosWidth switch
-            {
-                < 1 => 1,
-                > 8 => 8,
-                _ => value
-            };
+            if (ballPosWidth < 1)
+                ballPosWidth = 1;
+            else if (ballPosWidth > 8)
+                ballPosWidth = 8;
+            else
+                ballPosWidth = value;
         }
     }
+    //gridleri ayarlanabilir yap
+    // levelleri hep 10x10 a gore vermesin 12x10 yada 7x12 yapsın
+    // kamerayı bunlara gore ayarla.
+    //deadend verme durumunu coz
+    //encapsulation kısmını ayarlayarak daha buyuk gridler verdirebilirsin topa yaptın
 
 
     private void Start()
@@ -74,8 +79,8 @@ public class GridManager : MonoBehaviour
     private void GenerateLevel()
     {
         //Topun yeri encapsulationun dışında olmasının nedeni ilk seçime karışmasın.
-        ballPosWidth = Random.Range(1, 9);
-        ballPosHeight = Random.Range(1, 9);
+        ballPosWidth = Random.Range(1, width-1);
+        ballPosHeight = Random.Range(1, height-1);
         var ballObject = Instantiate(ball, grid[BallPosWidth, BallPosHeight].transform.position,
             Quaternion.identity, grid[BallPosWidth, BallPosHeight].transform);
         ballObject.name = "Ball";
@@ -111,7 +116,6 @@ public class GridManager : MonoBehaviour
 
     private void ManageMovement(int movement, int j, bool isVertical = false, bool isNegative = false)
     {
-        //DeadEndoluşturabiliyor onu ayarlayacaksın.
         if (j < movement)
         {
             if (grid[BallPosWidth, BallPosHeight].transform.GetChild(1).gameObject.activeSelf)
