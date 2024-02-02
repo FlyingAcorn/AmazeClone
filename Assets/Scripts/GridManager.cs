@@ -21,8 +21,8 @@ public class GridManager : MonoBehaviour
         {
             if (ballPosHeight < 1)
                 ballPosHeight = 1;
-            else if (ballPosHeight > 8)
-                ballPosHeight = 8;
+            else if (ballPosHeight > height-2)
+                ballPosHeight = height-2;
             else
                 ballPosHeight = value;
         }
@@ -35,18 +35,14 @@ public class GridManager : MonoBehaviour
         {
             if (ballPosWidth < 1)
                 ballPosWidth = 1;
-            else if (ballPosWidth > 8)
-                ballPosWidth = 8;
+            else if (ballPosWidth > width-2)
+                ballPosWidth = width-2;
             else
                 ballPosWidth = value;
         }
     }
-    //gridleri ayarlanabilir yap
-    // levelleri hep 10x10 a gore vermesin 12x10 yada 7x12 yapsın
-    // kamerayı bunlara gore ayarla.
+    //kamerayı bunlara gore ayarla.
     //deadend verme durumunu coz
-    //encapsulation kısmını ayarlayarak daha buyuk gridler verdirebilirsin topa yaptın
-
 
     private void Start()
     {
@@ -87,6 +83,8 @@ public class GridManager : MonoBehaviour
         ballObject.transform.position += new Vector3(0, 0.5f, 0);
         for (int i = 0; i < maxRepeat; i++)
         {
+            lastStopH = BallPosHeight;
+            lastStopW = BallPosWidth;
             // hateketin yonu 0 yukarı 1 asağı 2 sağ 3 sol 
             var direction = Random.Range(0, 4);
             var movement = Random.Range(2, 9);
@@ -108,8 +106,6 @@ public class GridManager : MonoBehaviour
                         break; 
                     }
             }
-            lastStopH = BallPosHeight;
-            lastStopW = BallPosWidth;
         }
         FillEmptyGrids();
     }
@@ -160,16 +156,24 @@ public class GridManager : MonoBehaviour
         {
             grid[i,0].transform.GetChild(1).gameObject.SetActive(true);
             grid[i,0].transform.GetChild(0).gameObject.SetActive(false);
+        }
+
+        for (int i = 0; i < height; i++)
+        {
             grid[0,i].transform.GetChild(1).gameObject.SetActive(true);
             grid[0,i].transform.GetChild(0).gameObject.SetActive(false);
         }
 
-        for (int j = 9; j >= 0; j--)
+        for (int j = width-1; j >= 0; j--)
         {
-            grid[j,9].transform.GetChild(1).gameObject.SetActive(true);
-            grid[j,9].transform.GetChild(0).gameObject.SetActive(false);
-            grid[9,j].transform.GetChild(1).gameObject.SetActive(true);
-            grid[9,j].transform.GetChild(0).gameObject.SetActive(false);
+            grid[j,height-1].transform.GetChild(1).gameObject.SetActive(true);
+            grid[j,height-1].transform.GetChild(0).gameObject.SetActive(false);
+        }
+
+        for (int i = height-1; i >=0 ; i--)
+        {
+            grid[width-1,i].transform.GetChild(1).gameObject.SetActive(true);
+            grid[width-1,i].transform.GetChild(0).gameObject.SetActive(false);
         }
 
         foreach (var t in grid)
