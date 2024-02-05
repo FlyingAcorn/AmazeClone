@@ -7,7 +7,8 @@ public class GridManager : Singleton<GridManager>
     [SerializeField] public int width;
     [SerializeField] public int height;
     private GameObject[,] grid;
-    [SerializeField] public List<GameObject> floors;
+    [SerializeField] public List<GameObject> whiteFloors;
+    [SerializeField] public List<GameObject> blueFloors;
     [SerializeField] private Ball ball;
     private GameObject createdBall;
     [SerializeField] private Floor floor;
@@ -50,6 +51,7 @@ public class GridManager : Singleton<GridManager>
         GenerateGrids();
         GenerateLevel();
         FloorList();
+        CameraManager.Instance.AdjustCamera(width,height);
     }
     private void GenerateGrids()
     {
@@ -78,7 +80,7 @@ public class GridManager : Singleton<GridManager>
         {
             if (t.transform.GetChild(0).gameObject.activeSelf)
             {
-                floors.Add(t.transform.GetChild(0).gameObject);
+                whiteFloors.Add(t.transform.GetChild(0).gameObject);
             } 
         }
     }
@@ -121,6 +123,9 @@ public class GridManager : Singleton<GridManager>
     {
         if (j < movement)
         {
+            //var obj = grid[BallPosWidth, BallPosHeight]
+            //.transform.GetComponentInChildren<Block>(buraya true yaparsan inaktif objelerede bakar);
+            //if(obj.activeSelf) bu commentteki gibi yap getchild bad practice
             if (grid[BallPosWidth, BallPosHeight].transform.GetChild(1).gameObject.activeSelf)
             {
                 BallPosWidth = lastStopW;
@@ -198,4 +203,5 @@ public class GridManager : Singleton<GridManager>
             t.transform.GetChild(1).gameObject.SetActive(false);
         }
     }
+    
 }

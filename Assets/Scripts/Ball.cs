@@ -103,6 +103,7 @@ public class Ball : MonoBehaviour
             var floorPos = floor.transform.position;
             floor.OnTouched();
             lastFloorPos = new Vector3(floorPos.x, floorPos.y+0.5f,floorPos.z);
+            
         }
     }
 }
