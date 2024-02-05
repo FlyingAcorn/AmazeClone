@@ -1,18 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Floor : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private Renderer myRender;
+    private void Start()
     {
-        
+        myRender = GetComponent<Renderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnTouched()
     {
-        
+        myRender.material.color = Color.blue;
+        GridManager.Instance.floors.Remove(gameObject);
+        if (GridManager.Instance.floors.Count == 0) 
+            GameManager.Instance.UpdateGameState(GameManager.GameState.Victory);
+    }
+
+    private void OnDisable()
+    {
+        if (GameManager.Instance.state == GameManager.GameState.Victory)
+        {
+            myRender.material.color = Color.white;
+        }
     }
 }

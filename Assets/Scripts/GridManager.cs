@@ -1,19 +1,21 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GridManager : MonoBehaviour
+public class GridManager : Singleton<GridManager>
 {
     [SerializeField] public int width;
     [SerializeField] public int height;
     private GameObject[,] grid;
+    [SerializeField] public List<GameObject> floors;
     [SerializeField] private Ball ball;
+    private GameObject createdBall;
     [SerializeField] private Floor floor;
     [SerializeField] private Block block;
     [SerializeField] private int maxRepeat;
     private int ballPosWidth;
     private int ballPosHeight;
     private int lastStopW,lastStopH;
-
     private int BallPosHeight
     {
         get => ballPosHeight;
@@ -27,7 +29,6 @@ public class GridManager : MonoBehaviour
                 ballPosHeight = value;
         }
     }
-
     private int BallPosWidth
     {
         get => ballPosWidth;
@@ -43,14 +44,13 @@ public class GridManager : MonoBehaviour
     }
     //kamerayı bunlara gore ayarla.
     //deadend verme durumunu coz
-
     private void Start()
     {
         grid = new GameObject[width, height];
         GenerateGrids();
         GenerateLevel();
+        FloorList();
     }
-
     private void GenerateGrids()
     {
         for (int x = 0; x < width; x++)
@@ -69,18 +69,26 @@ public class GridManager : MonoBehaviour
                 blockObject.gameObject.name = "Block" + x + "," + y;
             }
         }
-
+        createdBall = Instantiate(ball.gameObject);
+        createdBall.name = "Ball";
     }
-
+    private void FloorList()
+    {
+        foreach (var t in grid)
+        {
+            if (t.transform.GetChild(0).gameObject.activeSelf)
+            {
+                floors.Add(t.transform.GetChild(0).gameObject);
+            } 
+        }
+    }
     private void GenerateLevel()
     {
         //Topun yeri encapsulationun dışında olmasının nedeni ilk seçime karışmasın.
         ballPosWidth = Random.Range(1, width-1);
         ballPosHeight = Random.Range(1, height-1);
-        var ballObject = Instantiate(ball, grid[BallPosWidth, BallPosHeight].transform.position,
-            Quaternion.identity, grid[BallPosWidth, BallPosHeight].transform);
-        ballObject.name = "Ball";
-        ballObject.transform.position += new Vector3(0, 0.5f, 0);
+        createdBall.transform.position = 
+            grid[ballPosWidth, ballPosHeight].transform.position + new Vector3(0, 0.5f, 0);
         for (int i = 0; i < maxRepeat; i++)
         {
             lastStopH = BallPosHeight;
@@ -109,7 +117,6 @@ public class GridManager : MonoBehaviour
         }
         FillEmptyGrids();
     }
-
     private void ManageMovement(int movement, int j, bool isVertical = false, bool isNegative = false)
     {
         if (j < movement)
@@ -149,7 +156,6 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-
     private void FillEmptyGrids()
     {
         for (int i = 0; i < width; i++)
@@ -182,6 +188,14 @@ public class GridManager : MonoBehaviour
             {
                 t.transform.GetChild(1).gameObject.SetActive(true);
             }
+        }
+    }
+    public void DisableObjects()
+    {
+        foreach (var t in grid)
+        {
+            t.transform.GetChild(0).gameObject.SetActive(false);
+            t.transform.GetChild(1).gameObject.SetActive(false);
         }
     }
 }

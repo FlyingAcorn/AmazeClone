@@ -7,7 +7,8 @@ public class GameManager : Singleton<GameManager>
         Play,
         Pause,
         Settings,
-        MainMenu
+        MainMenu,
+        Victory
     }
     public GameState state;
 
@@ -25,6 +26,10 @@ public class GameManager : Singleton<GameManager>
         {
             
         }if (newState == GameState.MainMenu)
+        {
+            
+        }
+        if (newState == GameState.Victory)
         {
             
         }

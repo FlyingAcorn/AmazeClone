@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 public class Ball : MonoBehaviour
 {
@@ -8,6 +9,25 @@ public class Ball : MonoBehaviour
     private Vector3 lastFloorPos;
     private Vector3 startTouchPos;
     private Vector3 movementDirection;
+
+    private void Start()
+    {
+        GameManager.OnGameStateChanged += GameManagerOnOnGameStateChanged;
+    }
+    
+    private void OnDisable()
+    {
+        GameManager.OnGameStateChanged -= GameManagerOnOnGameStateChanged;
+    }
+    private void GameManagerOnOnGameStateChanged(GameManager.GameState state)
+    {
+
+        if (state == GameManager.GameState.Victory)
+        {
+            movementDirection = Vector3.zero;
+        }
+    }
+
     private void Update()
     {
         Movement();
@@ -76,13 +96,12 @@ public class Ball : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider trigger)
+    private void OnTriggerExit(Collider trigger)
     {
         if (trigger.gameObject.TryGetComponent(out Floor floor))
         {
             var floorPos = floor.transform.position;
-            floor.gameObject.TryGetComponent(out Renderer component);
-            component.material.color = Color.blue;
+            floor.OnTouched();
             lastFloorPos = new Vector3(floorPos.x, floorPos.y+0.5f,floorPos.z);
         }
     }
