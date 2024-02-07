@@ -4,6 +4,7 @@ public class GameManager : Singleton<GameManager>
     public static event Action<GameState> OnGameStateChanged;
     public enum GameState
     {
+        Generating,
         Play,
         Pause,
         Settings,
@@ -11,6 +12,7 @@ public class GameManager : Singleton<GameManager>
         Victory
     }
     public GameState state;
+    
 
     public void UpdateGameState(GameState newState)
     {
@@ -31,7 +33,7 @@ public class GameManager : Singleton<GameManager>
         }
         if (newState == GameState.Victory)
         {
-            
+            StartCoroutine(GridManager.Instance.NextLevelSequence());
         }
         OnGameStateChanged?.Invoke(newState);
     }
