@@ -20,6 +20,8 @@ public class GridManager : Singleton<GridManager>
     private int lastStopW,lastStopH;
     private GameObject currentLevel;
     private int successNumber;
+    private bool isOnBlock;
+    public Vector3 initialBallPos;
     
     private int BallPosHeight
     {
@@ -233,11 +235,11 @@ public class GridManager : Singleton<GridManager>
     private void TryLevel()
     {
         Randomizer();
-        for (int i = 0; i <= 10000; i++)
+        for (int i = 0; i < 10000; i++)
         {
+            isOnBlock = false;
             var direction = Random.Range(0, 4);
-            var movement = Random.Range(2, 9);
-            for (int j = 0; j <= movement; j++)
+            while (!isOnBlock)
             {
                 switch (direction) 
                 {
@@ -252,8 +254,7 @@ public class GridManager : Singleton<GridManager>
                         break;
                     case 3:
                         TryLevelsMovement(isNegative: true);
-                        break; 
-                
+                        break;
                 }
             }
             //TODO: Burada yapmak istediğin oyunu bot bitirirse succes sayısını arttırsın ve bir daha farklı bir konumu denesin
@@ -268,32 +269,31 @@ public class GridManager : Singleton<GridManager>
                 whiteFloors.Clear();
                 FloorList();
             }
-            if (i != 10000) continue;
+            if (i != 9999) continue;
             if (successNumber > 200)
             {
                 Debug.Log("yedi");
                 whiteFloors.Clear();
                 FloorList();
-                GameManager.Instance.UpdateGameState(GameManager.GameState.Play);
-                successNumber = 0;
             }
             else if (whiteFloors.Count != 0)
             {
                 Debug.Log("yemedi");
                 foreach (var t in grid)
                 {
-                    var blockOfGrid = t.transform.GetComponentInChildren<Block>(true);
-                    var floorOfGrid = t.transform.GetComponentInChildren<Floor>(true);
-                    blockOfGrid.gameObject.SetActive(false);
-                    floorOfGrid.gameObject.SetActive(false);
-                    Debug.Log("yokedildi");
+                    var blockOfGridInT = t.transform.GetComponentInChildren<Block>(true);
+                    var floorOfGridInT = t.transform.GetComponentInChildren<Floor>(true);
+                    blockOfGridInT.gameObject.SetActive(false);
+                    floorOfGridInT.gameObject.SetActive(false);
                 }
+                whiteFloors.Clear();
                 GenerateLevel();
             }
-        }
+            successNumber = 0;
+        } 
     }
 
-    private void TryLevelsMovement(bool isVertical = false, bool isNegative = false)
+     private void TryLevelsMovement(bool isVertical = false, bool isNegative = false)
     {
         var blockOfGrid = grid[BallPosWidth, BallPosHeight].transform.GetComponentInChildren<Block>(true);
         var floorOfGrid = grid[BallPosWidth, BallPosHeight].transform.GetComponentInChildren<Floor>(true);
@@ -319,6 +319,7 @@ public class GridManager : Singleton<GridManager>
             {
                 BallPosWidth += isNegative ? +1 : -1;
             }
+            isOnBlock = true;
         }
     }
      public IEnumerator NextLevelSequence()
@@ -337,6 +338,7 @@ public class GridManager : Singleton<GridManager>
         currentLevel.transform.DOMove(new Vector3(0, 0, 0), 1);
         yield return new WaitForSeconds(1);
         CameraManager.Instance.AdjustCamera(width,height);
+        yield return new WaitForSeconds(1.5f);
         GameManager.Instance.UpdateGameState(GameManager.GameState.Play);
         yield return null;
     }

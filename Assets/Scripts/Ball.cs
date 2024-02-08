@@ -9,10 +9,13 @@ public class Ball : MonoBehaviour
     private Vector3 lastFloorPos;
     private Vector3 startTouchPos;
     private Vector3 movementDirection;
+    private Rigidbody myBody;
 
+    
     private void Start()
     {
         GameManager.OnGameStateChanged += GameManagerOnOnGameStateChanged;
+        myBody = GetComponent<Rigidbody>();
     }
     
     private void OnDisable()
@@ -21,9 +24,15 @@ public class Ball : MonoBehaviour
     }
     private void GameManagerOnOnGameStateChanged(GameManager.GameState state)
     {
-        if (state == GameManager.GameState.Victory)
+        //TODO: BALL SCRIPTINDE COK SORUN VAR ÇOZ YADA BAŞTAN YAP
+        // Sorunlar topun yeni levele geçerken kayması
+        // bu kaymadan dolayı işinlanması duvara çarpınca ilk hamlesi olarak
+        // frame sorunu olunca topun triggerlanmaması floorla
+        if (state is GameManager.GameState.Victory or GameManager.GameState.Play)
         {
+            myBody.velocity = Vector3.zero;
             movementDirection = Vector3.zero;
+            transform.localScale = Vector3.one;
             blockInput = true;
         }
         if (state == GameManager.GameState.Play)
@@ -31,13 +40,13 @@ public class Ball : MonoBehaviour
             blockInput = false;
         }
     }
-
     private void Update()
     {
         Movement();
     }
     private void Movement()
     {
+        if (GameManager.Instance.state != GameManager.GameState.Play) return;
         if (!blockInput)
         {
             TouchInput();
@@ -110,9 +119,10 @@ public class Ball : MonoBehaviour
         {
             GridManager.Instance.blueFloors.Add(floor.gameObject);
         }
-        if (GameManager.Instance.state !=GameManager.GameState.Play) return;
         if (GridManager.Instance.whiteFloors.Count != 0) return;
+        if (GameManager.Instance.state !=GameManager.GameState.Play) return;
         GameManager.Instance.UpdateGameState(GameManager.GameState.Victory);
-        transform.localScale = Vector3.one;
     }
+
+   
 }

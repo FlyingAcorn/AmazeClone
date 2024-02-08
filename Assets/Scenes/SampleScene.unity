@@ -159,7 +159,8 @@ MonoBehaviour:
   ball: {fileID: 4237553364587015025, guid: 5f5b36b76a2a1844e944b1f913703d72, type: 3}
   floor: {fileID: 6283344890221968267, guid: 4191933e7f18dad4a9593e5645b1127d, type: 3}
   block: {fileID: 2360900704706407377, guid: d0d385e090f75e64399f65e5f58b7e6e, type: 3}
-  maxRepeat: 3000
+  maxRepeat: 1000
+  initialBallPos: {x: 0, y: 0, z: 0}
 --- !u!4 &323935971
 Transform:
   m_ObjectHideFlags: 0
@@ -549,7 +550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d39eed14c7a8b2a4ebaeeb7c55d1a44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
+  state: 1
 --- !u!4 &1530134016
 Transform:
   m_ObjectHideFlags: 0

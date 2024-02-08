@@ -1,7 +1,5 @@
-
 using DG.Tweening;
 using UnityEngine;
-
 public class CameraManager : Singleton<CameraManager>
 {
     private float dampVelocity;
