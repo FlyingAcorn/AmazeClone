@@ -28,16 +28,20 @@ public class Ball : MonoBehaviour
         // Sorunlar topun yeni levele geçerken kayması
         // bu kaymadan dolayı işinlanması duvara çarpınca ilk hamlesi olarak
         // frame sorunu olunca topun triggerlanmaması floorla
-        if (state is GameManager.GameState.Victory or GameManager.GameState.Play)
+        // hız atrttığında ışınlanma yapıyor rigidbody addforce yapyada rigidbody velocity.
+        if (state == GameManager.GameState.Victory)
         {
             myBody.velocity = Vector3.zero;
+            transform.position = lastFloorPos;
             movementDirection = Vector3.zero;
             transform.localScale = Vector3.one;
             blockInput = true;
         }
         if (state == GameManager.GameState.Play)
         {
+            movementDirection = Vector3.zero;
             blockInput = false;
+            lastFloorPos = transform.position;
         }
     }
     private void Update()
@@ -56,7 +60,9 @@ public class Ball : MonoBehaviour
         }
         else
         {
-            transform.position += movementDirection * (Time.deltaTime * ballSpeed);
+            myBody.velocity = new Vector3(movementDirection.x * ballSpeed, 0,
+                movementDirection.z * ballSpeed);
+           // transform.position += movementDirection * (Time.deltaTime * ballSpeed);
         }
     }
     private void TouchInput()
@@ -86,13 +92,20 @@ public class Ball : MonoBehaviour
 #if UNITY_EDITOR
     private void KeyInput()
     {
-        if (!Input.GetButtonDown("Horizontal") && !Input.GetButtonDown("Vertical")) return;
         movementX = Input.GetAxisRaw("Horizontal");
         movementZ = Input.GetAxisRaw("Vertical");
-        transform.localScale = Input.GetButtonDown("Vertical") ?
-            new Vector3( 0.7f, 1,1) : new Vector3( 1, 1,0.7f);
-        blockInput = true;
-        movementDirection = new Vector3(movementX, 0, movementZ).normalized;
+        if (Input.GetButtonDown("Horizontal"))
+        {
+            movementDirection = new Vector3(movementX, 0, 0);
+            transform.localScale = new Vector3(1, 1, 0.7f);
+            blockInput = true;
+        }
+        else if (Input.GetButtonDown("Vertical"))
+        {
+            movementDirection = new Vector3(0, 0, movementZ);
+            transform.localScale = new Vector3(0.7f, 1, 1);
+            blockInput = true;
+        }
     }
 #endif
 

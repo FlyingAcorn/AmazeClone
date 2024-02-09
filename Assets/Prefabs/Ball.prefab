@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockInput: 0
-  ballSpeed: 18
+  ballSpeed: 25
 --- !u!54 &5963746257931278092
 Rigidbody:
   m_ObjectHideFlags: 0

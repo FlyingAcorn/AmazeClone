@@ -7,7 +7,7 @@ public class GridManager : Singleton<GridManager>
 {
     [SerializeField] public int width;
     [SerializeField] public int height;
-    private GameObject[,] grid;
+    private GridPoint[,] grid;
     [SerializeField] public List<GameObject> whiteFloors;
     [SerializeField] public List<GameObject> blueFloors;
     [SerializeField] private Ball ball;
@@ -21,7 +21,8 @@ public class GridManager : Singleton<GridManager>
     private GameObject currentLevel;
     private int successNumber;
     private bool isOnBlock;
-    public Vector3 initialBallPos;
+    [SerializeField] private GridPoint gridPointObject;
+    
     
     private int BallPosHeight
     {
@@ -51,7 +52,7 @@ public class GridManager : Singleton<GridManager>
     }
     private void Start()
     {
-        grid = new GameObject[width, height];
+        grid = new GridPoint[width, height];
         createdBall = Instantiate(ball.gameObject);
         createdBall.name = "Ball";
         GenerateGrids(0);
@@ -68,13 +69,9 @@ public class GridManager : Singleton<GridManager>
         {
             for (int y = 0; y < height; y++)
             {
-                var gO = new GameObject(x + "," + y)
-                {
-                    transform =
-                    {
-                        parent = level.transform
-                    }
-                };
+                var gO = Instantiate(gridPointObject, parent: level.transform);
+                gO.gameObject.name = x+","+y;
+                gO.gridPoints = new Vector2Int(x,y);
                 grid[x, y] = gO;
                 gO.transform.position = new Vector3(x+gridXOffset + 0.5f, 0, y + 0.5f);
                 var floorObject = Instantiate(floor, new Vector3(x+gridXOffset + 0.5f, 0, y + 0.5f),
@@ -223,18 +220,15 @@ public class GridManager : Singleton<GridManager>
 
     private void Randomizer()
     {
-        ballPosWidth = Random.Range(1, width-1);
-        ballPosHeight = Random.Range(1, height-1);
-        var blockOfGrid = grid[ballPosWidth, ballPosHeight].transform.GetComponentInChildren<Block>(true);
-        if (blockOfGrid.gameObject.activeSelf)
-        {
-            Randomizer();
-        }
+        whiteFloors[Random.Range(0, whiteFloors.Count)].transform.parent.TryGetComponent(out GridPoint gridPoint);
+        ballPosWidth = gridPoint.gridPoints.x;
+        ballPosHeight = gridPoint.gridPoints.y;
         Debug.Log(ballPosWidth+" "+ballPosHeight+ "keke");
     }
     private void TryLevel()
     {
         Randomizer();
+        
         for (int i = 0; i < 10000; i++)
         {
             isOnBlock = false;
@@ -265,9 +259,9 @@ public class GridManager : Singleton<GridManager>
             {
                 successNumber++;
                 Debug.Log("cözdü başka yerden deniyor" +"x" + successNumber);
-                Randomizer();
                 whiteFloors.Clear();
                 FloorList();
+                Randomizer();
             }
             if (i != 9999) continue;
             if (successNumber > 200)
@@ -330,9 +324,11 @@ public class GridManager : Singleton<GridManager>
         yield return new WaitForSeconds(1);
         currentLevel.transform.DOMove(new Vector3(-30, 0,0),1);
         yield return new WaitForSeconds(1);
+        createdBall.transform.parent = null;
+        currentLevel.SetActive(false);
         width = Random.Range(6,13);
         height = Random.Range(6,13);
-        grid = new GameObject[width, height];
+        grid = new GridPoint[width, height];
         GenerateGrids(30);
         GenerateLevel();
         currentLevel.transform.DOMove(new Vector3(0, 0, 0), 1);

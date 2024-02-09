@@ -160,7 +160,8 @@ MonoBehaviour:
   floor: {fileID: 6283344890221968267, guid: 4191933e7f18dad4a9593e5645b1127d, type: 3}
   block: {fileID: 2360900704706407377, guid: d0d385e090f75e64399f65e5f58b7e6e, type: 3}
   maxRepeat: 1000
-  initialBallPos: {x: 0, y: 0, z: 0}
+  gridPointObject: {fileID: 6285523048039122262, guid: fe312bf51ab8d5549aaa122e32555597,
+    type: 3}
 --- !u!4 &323935971
 Transform:
   m_ObjectHideFlags: 0
