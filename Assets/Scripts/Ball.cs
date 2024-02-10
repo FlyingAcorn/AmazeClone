@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 public class Ball : MonoBehaviour
 {
@@ -10,8 +9,12 @@ public class Ball : MonoBehaviour
     private Vector3 startTouchPos;
     private Vector3 movementDirection;
     private Rigidbody myBody;
+    [SerializeField] private ParticleSystem hitParticle;
 
-    
+
+
+
+
     private void Start()
     {
         GameManager.OnGameStateChanged += GameManagerOnOnGameStateChanged;
@@ -50,6 +53,8 @@ public class Ball : MonoBehaviour
     }
     private void Movement()
     {
+        //Movement kısmına raycast atabilirsin
+        //dibindeki bloğa hit oluyorsa o yöne gidemez.
         if (GameManager.Instance.state != GameManager.GameState.Play) return;
         if (!blockInput)
         {
@@ -111,9 +116,10 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!collision.gameObject.TryGetComponent(out Block _)) return;
+        if (!collision.gameObject.TryGetComponent(out Block _ )) return;
         if (GameManager.Instance.state == GameManager.GameState.Play)
         {
+            hitParticle.Play();
             transform.localScale = Vector3.one;
             transform.position = lastFloorPos;
         }
@@ -123,6 +129,8 @@ public class Ball : MonoBehaviour
     private void OnTriggerEnter(Collider trigger)
     {
         if (!trigger.gameObject.TryGetComponent(out Floor floor)) return;
+        
+        floor.floorParticle.Play();
         var floorPos = floor.transform.position;
         lastFloorPos = new Vector3(floorPos.x, floorPos.y+0.5f,floorPos.z);
         floor.gameObject.TryGetComponent(out Renderer component);
