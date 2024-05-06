@@ -20,6 +20,7 @@ public class GridManager : Singleton<GridManager>
     private int lastStopW,lastStopH;
     private GameObject currentLevel;
     private int successNumber;
+    private int levelNo;
     private bool isOnBlock;
     [SerializeField] private GridPoint gridPointObject;
     
@@ -62,7 +63,7 @@ public class GridManager : Singleton<GridManager>
     }
     private void GenerateGrids(int gridXOffset)
     {
-        var level = new GameObject("deneme");
+        var level = new GameObject("level"+levelNo);
         level.transform.position += new Vector3(gridXOffset, 0, 0);
         currentLevel = level;
         for (int x = 0; x < width; x++)
@@ -110,7 +111,7 @@ public class GridManager : Singleton<GridManager>
             // hateketin yonu 0 yukarı 1 asağı 2 sağ 3 sol 
             var direction = Random.Range(0, 4);
             var movement = Random.Range(2, 9);
-            for (int j = 0; j <= movement; j++)//TODO:Checkthis with Ciho
+            for (int j = 0; j <= movement; j++)
             {
                 switch (direction) 
                     {
@@ -179,11 +180,6 @@ public class GridManager : Singleton<GridManager>
     }
     private void FillEmptyGrids()
     {
-        //TODO: Bu kısmı cihana sor her köşesine getcomponentinchildren yapmadan yapmayı.
-        // burada borderin koşelerini ve boş kalan yerleri blocklarla dolduruyoruz
-        // koda bunu ikinci bir border olarak ekleyebilirdin ama yapmadın.
-        // yapmama nedenin bunu onceden düşünmemiş olman ve şu anda yapman demek bir çok şeyi değiştirmen demek.
-        // lütfen birdaha eklemen gereken seyleri planlamadan yapma :C
         for (int i = 0; i < width; i++)
         {
             grid[i,0].transform.GetChild(1).gameObject.SetActive(true);
@@ -254,7 +250,7 @@ public class GridManager : Singleton<GridManager>
             if (whiteFloors.Count == 0)
             {
                 successNumber++;
-                Debug.Log("cözdü başka yerden deniyor" +"x" + successNumber);
+                Debug.Log("success" +"x" + successNumber);
                 whiteFloors.Clear();
                 FloorList();
                 Randomizer();
@@ -268,7 +264,7 @@ public class GridManager : Singleton<GridManager>
             }
             else if (whiteFloors.Count != 0)
             {
-                Debug.Log("yemedi");
+                Debug.Log("failed");
                 foreach (var t in grid)
                 {
                     var blockOfGridInT = t.transform.GetComponentInChildren<Block>(true);
