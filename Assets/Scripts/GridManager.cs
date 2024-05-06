@@ -99,7 +99,6 @@ public class GridManager : Singleton<GridManager>
     }
     private void GenerateLevel()
     {
-        //Topun yeri encapsulationun dışında olmasının nedeni ilk seçime karışmasın.
         ballPosWidth = Random.Range(1, width-1);
         ballPosHeight = Random.Range(1, height-1);
         createdBall.transform.position = 
@@ -251,9 +250,6 @@ public class GridManager : Singleton<GridManager>
                         break;
                 }
             }
-            //TODO: Burada yapmak istediğin oyunu bot bitirirse succes sayısını arttırsın ve bir daha farklı bir konumu denesin
-            //TODO: eğer başarı sayısı belirli bir değerden yüksekse  versin leveli değilse başka bir puzzle yapsın aynı şeyleri tekrarlasın
-            // bir yerde hata yaptın cihana sor ilk level kusursuz sonrakiler kusur veriyor
             Debug.Log(whiteFloors.Count);
             if (whiteFloors.Count == 0)
             {

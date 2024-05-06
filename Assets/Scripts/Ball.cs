@@ -27,11 +27,6 @@ public class Ball : MonoBehaviour
     }
     private void GameManagerOnOnGameStateChanged(GameManager.GameState state)
     {
-        //TODO: BALL SCRIPTINDE COK SORUN VAR ÇOZ YADA BAŞTAN YAP
-        // Sorunlar topun yeni levele geçerken kayması
-        // bu kaymadan dolayı işinlanması duvara çarpınca ilk hamlesi olarak
-        // frame sorunu olunca topun triggerlanmaması floorla
-        // hız atrttığında ışınlanma yapıyor rigidbody addforce yapyada rigidbody velocity.
         if (state == GameManager.GameState.Victory)
         {
             myBody.velocity = Vector3.zero;
